@@ -9,10 +9,13 @@ namespace DHDM.FlyMark;
 internal static class JoystickListener
 {
 	static bool listening;
+	static bool lastLaunch;
+	static bool lastReset;	
 	static DirectInput directInput;
 	static Joystick joystick;
 	static double lastTiltSent;
 	static double lastThrustSent;
+
 
 	public static Joystick Joystick {
 		get
@@ -123,6 +126,8 @@ internal static class JoystickListener
 		}
 		double newTiltDegrees = double.MinValue;
 		double newThrust = double.MinValue;
+		bool newLaunch = false;
+		bool newReset = false;
 
 		foreach (var state in data)
 		{
@@ -132,7 +137,26 @@ internal static class JoystickListener
 			if (state.Offset == JoystickOffset.RotationY)
 				newThrust = Math.Round(Map16Bit(state.Value, 9, 1));
 
+			if (state.Offset == JoystickOffset.Buttons0)
+				newLaunch = state.Value == 128;
+
+			if (state.Offset == JoystickOffset.Buttons1)
+				newReset = state.Value == 128;
+
 			Debug.WriteLine(state);
+		}
+
+		if (newLaunch != lastLaunch)
+		{
+			lastLaunch = newLaunch;
+			if (newLaunch)
+				DroneCommands.Chat($"!sl");
+		}
+		if (newReset != lastReset)
+		{
+			lastReset = newReset;
+			if (newReset)
+				DroneCommands.Chat($"!rm");
 		}
 
 		if (newTiltDegrees != double.MinValue && newTiltDegrees != lastTiltSent)
