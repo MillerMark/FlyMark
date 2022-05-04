@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DHDM.FlyMark;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,13 @@ namespace FlyMark
 		public MainWindow()
 		{
 			InitializeComponent();
+			if (!FlyMark.CredentialManager.StoredOnLocalMachine())
+			{
+				FrmGetApiKey frmGetApiKey = new FrmGetApiKey();
+				frmGetApiKey.ShowDialog();
+			}
+			DroneCommands.Connect();
+			JoystickListener.StartListening();
 		}
 	}
 }
