@@ -34,7 +34,7 @@ namespace FlyMark
 			DialogResult = true;
 
 			//! Careful when debugging not to unintentionally reveal secrets!
-			FlyMark.CredentialManager.SaveKeys(tbxTwitchUserName.Text, tbxTwitchPassword.Password);
+			CredentialManager.SaveKeys(tbxTwitchUserName.Text, tbxTwitchPassword.Password);
 			Close();
 		}
 

@@ -11,13 +11,14 @@ internal static class JoystickListener
 	static bool listening;
 	static bool lastLaunch;
 	static bool lastReset;	
-	static DirectInput directInput;
-	static Joystick joystick;
+	static DirectInput? directInput;
+	static Joystick? joystick;
 	static double lastTiltSent;
+	static double lastScaleSent;
 	static double lastThrustSent;
 
 
-	public static Joystick Joystick {
+	public static Joystick? Joystick {
 		get
 		{
 			if (joystick != null)
@@ -52,8 +53,11 @@ internal static class JoystickListener
 	{
 		var joystickGuid = Guid.Empty;
 
+		if (directInput == null)
+			return Guid.Empty;
+
 		foreach (var deviceInstance in directInput.GetDevices(DeviceType.Gamepad,
-					DeviceEnumerationFlags.AllDevices))
+				DeviceEnumerationFlags.AllDevices))
 			joystickGuid = deviceInstance.InstanceGuid;
 
 		// If Gamepad not found, look for a Joystick
@@ -130,6 +134,8 @@ internal static class JoystickListener
 		double newThrust = double.MinValue;
 		bool newLaunch = false;
 		bool newReset = false;
+		double newScale = double.MinValue;
+
 
 		foreach (var state in data)
 		{
@@ -144,6 +150,9 @@ internal static class JoystickListener
 
 			if (state.Offset == JoystickOffset.Buttons1)
 				newReset = state.Value == 128;
+
+			if (state.Offset == JoystickOffset.Y)
+				newScale = Math.Round(Map16Bit(state.Value, 1, 9.9), 1);
 
 			Debug.WriteLine(state);
 		}
@@ -166,10 +175,17 @@ internal static class JoystickListener
 			lastTiltSent = newTiltDegrees;
 			DroneCommands.Chat($"!tilt {newTiltDegrees}");
 		}
+
 		if (newThrust != double.MinValue && newThrust != lastThrustSent)
 		{
 			lastThrustSent = newThrust;
 			DroneCommands.Chat($"!thrust {newThrust}");
+		}
+
+		if (newScale != double.MinValue && newScale != lastScaleSent)
+		{
+			lastScaleSent = newScale;
+			DroneCommands.Chat($"!GotoZ {newScale}");
 		}
 	}
 }

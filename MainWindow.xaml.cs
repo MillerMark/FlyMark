@@ -24,7 +24,7 @@ namespace FlyMark
 		public MainWindow()
 		{
 			InitializeComponent();
-			if (!FlyMark.CredentialManager.StoredOnLocalMachine())
+			if (!CredentialManager.StoredOnLocalMachine())
 			{
 				FrmGetApiKey frmGetApiKey = new FrmGetApiKey();
 				frmGetApiKey.ShowDialog();
