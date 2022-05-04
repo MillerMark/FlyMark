@@ -83,12 +83,14 @@ internal static class JoystickListener
 				GetLatestJoystickPosition();
 				Thread.Sleep(300);
 			}
+			Joystick?.Dispose();
 
 		}).Start();
 	}
 
 	public static void StopListening()
 	{
+		
 		listening = false;
 	}
 
